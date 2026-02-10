@@ -3,9 +3,13 @@
 A Rust implementation of the Occam 1D inversion algorithm for Controlled Source
 Electromagnetic (CSEM) and Magnetotelluric (MT) data.
 
-Based on the Fortran implementation by
-[Kerry Key](https://marineemlab.ucsd.edu/Projects/Occam/),
-Scripps Institution of Oceanography.
+Based on the Fortran [OCCAM1DCSEM](https://marineemlab.ucsd.edu/Projects/Occam/1DCSEM/index.html)
+and [Dipole1D](https://marineemlab.ucsd.edu/Projects/Occam/1DCSEM/index.html)
+codes by Kerry Key, developed at the
+[Marine EM Laboratory](https://marineemlab.ucsd.edu/),
+Scripps Institution of Oceanography, UC San Diego.
+The original Fortran code is sponsored by the
+[Seafloor Electromagnetic Methods Consortium (SEMC)](https://marineemlab.ucsd.edu/semc.html).
 
 ## Features
 
@@ -136,12 +140,66 @@ damping, optional bandpass/exponential bounds transforms.
 
 ## References
 
-- Constable, S. C., Parker, R. L., & Constable, C. G. (1987). Occam's
-  inversion: A practical algorithm for generating smooth models from
-  electromagnetic sounding data. *Geophysics*, 52(3), 289-300.
-- Key, K. (2009). 1D inversion of multicomponent, multifrequency marine CSEM
-  data. *Geophysics*, 74(2), F9-F20.
+If you publish results obtained with OxidizedOccam, please cite the following
+papers describing the underlying algorithms:
+
+**Dipole1D forward engine and 1D CSEM inversion methodology** (primary citation):
+
+> Key, K., 2009, 1D inversion of multicomponent, multifrequency marine CSEM
+> data: Methodology and synthetic studies for resolving thin resistive layers:
+> *Geophysics*, 74(2), F9--F20.
+> [doi:10.1190/1.3058434](https://doi.org/10.1190/1.3058434)
+> ([PDF](https://marineemlab.ucsd.edu/~kkey/Pubs/2009b.pdf))
+
+**Occam's inversion algorithm**:
+
+> Constable, S. C., Parker, R. L., & Constable, C. G., 1987, Occam's
+> inversion: A practical algorithm for generating smooth models from
+> electromagnetic sounding data: *Geophysics*, 52(3), 289--300.
+> [doi:10.1190/1.1442303](https://doi.org/10.1190/1.1442303)
+> ([PDF](https://marineemlab.ucsd.edu/~steve/bio/Occam1D.pdf))
+
+**Digital filter method for Hankel transforms**:
+
+> Key, K., 2012, Is the fast Hankel transform faster than quadrature?:
+> *Geophysics*, 77(3), F21--F30.
+> [doi:10.1190/geo2011-0237.1](https://doi.org/10.1190/geo2011-0237.1)
+
+**Wait recursion for layered media impedances**:
+
+> Wait, J. R., 1954, On the relation between telluric currents and the
+> earth's magnetic field: *Geophysics*, 19(2), 281--289.
+
+**Bounds transformations for constrained inversion**:
+
+> Key, K., Bounds transformations for OCCAM1DCSEM.
+> ([PDF](https://marineemlab.ucsd.edu/Projects/Occam/1DCSEM/BoundsTransformations.pdf))
+
+### Presentations and acknowledgments
+
+If you present results obtained with OxidizedOccam, please include an
+acknowledgment to the **Marine EM Laboratory at Scripps Institution of
+Oceanography**.
+
+## Related Software
+
+| Software | Description | Link |
+|----------|-------------|------|
+| **OCCAM1DCSEM** | Original Fortran 1D CSEM/MT inversion (v3.13) | [Download](https://marineemlab.ucsd.edu/Projects/Occam/1DCSEM/index.html) |
+| **Occam2DMT** | Fortran 2D MT inversion | [Info](https://marineemlab.ucsd.edu/Projects/Occam/2DMT/index.html) |
+| **MARE2DEM** | Finite-element 2D EM forward/inverse modeling | [Info](https://marineemlab.ucsd.edu/Projects/MARE2D/index.html) |
+| **WHAM** | Web-hosted Dipole1D forward modeling (browser-based) | [Launch](https://marineemlab.ucsd.edu/WHAM.html) |
 
 ## License
 
-MIT
+This project is licensed under the
+[GNU General Public License, Version 3.0](https://www.gnu.org/licenses/gpl-3.0.html)
+(or later), the same license as the original Fortran
+[OCCAM1DCSEM and Dipole1D](https://marineemlab.ucsd.edu/Projects/Occam/1DCSEM/index.html)
+codes by Kerry Key. See [LICENSE](LICENSE) for the full text.
+
+## Contact
+
+For questions about the original Fortran codes, contact the
+[Marine EM Laboratory](https://marineemlab.ucsd.edu/) at Scripps Institution
+of Oceanography (sconstable@ucsd.edu).

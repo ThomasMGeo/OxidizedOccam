@@ -13,6 +13,9 @@ Cargo.lock
 .DS_Store
 Thumbs.db
 
+# Original Fortran/Matlab distribution (download from https://marineemlab.ucsd.edu/Projects/Occam/1DCSEM/)
+Occam1DCSEM_matlab/
+
 # Test outputs
 *.iter
 *.resp

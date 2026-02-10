@@ -12,7 +12,7 @@ members = [
 version = "0.1.0"
 edition = "2021"
 authors = ["OxidizedOccam Contributors"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 repository = "https://github.com/thomasmartin/OxidizedOccam"
 description = "Rust implementation of Occam 1D inversion for CSEM and MT data"
 
