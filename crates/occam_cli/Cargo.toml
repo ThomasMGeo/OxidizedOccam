@@ -1,0 +1,17 @@
+[package]
+name = "occam_cli"
+version.workspace = true
+edition.workspace = true
+description = "Command-line interface for Occam 1D inversion"
+
+[[bin]]
+name = "occam1d"
+path = "src/main.rs"
+
+[dependencies]
+clap.workspace = true
+anyhow.workspace = true
+occam_core.workspace = true
+occam_io.workspace = true
+dipole1d.workspace = true
+mt1d.workspace = true

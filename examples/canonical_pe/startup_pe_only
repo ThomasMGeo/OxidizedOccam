@@ -1,0 +1,35 @@
+Format:             OCCAMITER_FLEX
+Description:        tilted transmitter PE only (no fields)
+Model File:         model
+Data File:          tilted_pe_only.data
+Date/Time:          02/09/2026 00:00:00.000
+Iterations to run:  100
+Target Misfit:      1.000000
+Roughness Type:     1
+Stepsize Cut Count: 8
+Debug Level:        1
+Iteration:          0
+Lagrange Value:     5.000000
+Roughness Value:    1.0000000E+10
+Misfit Value:       1000.000
+Misfit Reached:     0
+Param Count:        75
+     0.0       0.0       0.0       0.0
+     0.0       0.0       0.0       0.0
+     0.0       0.0       0.0       0.0
+     0.0       0.0       0.0       0.0
+     0.0       0.0       0.0       0.0
+     0.0       0.0       0.0       0.0
+     0.0       0.0       0.0       0.0
+     0.0       0.0       0.0       0.0
+     0.0       0.0       0.0       0.0
+     0.0       0.0       0.0       0.0
+     0.0       0.0       0.0       0.0
+     0.0       0.0       0.0       0.0
+     0.0       0.0       0.0       0.0
+     0.0       0.0       0.0       0.0
+     0.0       0.0       0.0       0.0
+     0.0       0.0       0.0       0.0
+     0.0       0.0       0.0       0.0
+     0.0       0.0       0.0       0.0
+     0.0       0.0       0.0

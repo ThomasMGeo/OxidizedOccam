@@ -1,0 +1,47 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/occam_core",
+    "crates/dipole1d",
+    "crates/mt1d",
+    "crates/occam_io",
+    "crates/occam_cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["OxidizedOccam Contributors"]
+license = "MIT"
+repository = "https://github.com/thomasmartin/OxidizedOccam"
+description = "Rust implementation of Occam 1D inversion for CSEM and MT data"
+
+[workspace.dependencies]
+# Linear algebra
+nalgebra = "0.33"
+num-complex = "0.4"
+ndarray = "0.16"
+ndarray-linalg = "0.17"
+
+# Error handling
+thiserror = "2.0"
+anyhow = "1.0"
+
+# CLI
+clap = { version = "4.5", features = ["derive"] }
+
+# Parallelization
+rayon = "1.10"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Testing
+approx = "0.5"
+
+# Internal crates
+occam_core = { path = "crates/occam_core" }
+dipole1d = { path = "crates/dipole1d" }
+mt1d = { path = "crates/mt1d" }
+occam_io = { path = "crates/occam_io" }

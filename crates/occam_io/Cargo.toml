@@ -1,0 +1,13 @@
+[package]
+name = "occam_io"
+version.workspace = true
+edition.workspace = true
+description = "File I/O for Occam inversion (EMData, models, iterations)"
+
+[dependencies]
+thiserror.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+
+[dev-dependencies]
+approx.workspace = true

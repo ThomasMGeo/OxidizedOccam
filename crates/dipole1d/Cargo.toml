@@ -1,0 +1,14 @@
+[package]
+name = "dipole1d"
+version.workspace = true
+edition.workspace = true
+description = "1D CSEM forward modeling using Dipole1D algorithm"
+
+[dependencies]
+num-complex.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+rayon.workspace = true
+
+[dev-dependencies]
+approx.workspace = true
