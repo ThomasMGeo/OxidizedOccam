@@ -46,34 +46,6 @@ pub fn compute_impedance(model: &MT1DModel, frequency: f64) -> Result<Complex64>
     Ok(z)
 }
 
-/// Compute intrinsic impedance for a layer
-///
-/// Z_intrinsic = i*omega*mu0 / k
-/// where k = sqrt(i*omega*mu0*sigma)
-pub fn intrinsic_impedance(resistivity: f64, frequency: f64) -> Complex64 {
-    let omega = 2.0 * PI * frequency;
-    let sigma = 1.0 / resistivity;
-    let k = complex_sqrt(Complex64::new(0.0, omega * MU0 * sigma));
-    Complex64::new(0.0, omega * MU0) / k
-}
-
-/// Compute propagation constant for a layer
-///
-/// k = sqrt(i*omega*mu0*sigma)
-pub fn propagation_constant(resistivity: f64, frequency: f64) -> Complex64 {
-    let omega = 2.0 * PI * frequency;
-    let sigma = 1.0 / resistivity;
-    complex_sqrt(Complex64::new(0.0, omega * MU0 * sigma))
-}
-
-/// Compute skin depth for a layer
-///
-/// delta = sqrt(2*rho / (omega*mu0))
-pub fn skin_depth(resistivity: f64, frequency: f64) -> f64 {
-    let omega = 2.0 * PI * frequency;
-    (2.0 * resistivity / (omega * MU0)).sqrt()
-}
-
 /// Complex square root with proper branch cut
 pub(crate) fn complex_sqrt(z: Complex64) -> Complex64 {
     let r = z.norm();

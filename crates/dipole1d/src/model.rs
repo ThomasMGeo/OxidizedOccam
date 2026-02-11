@@ -4,7 +4,6 @@ use crate::constants::MU0;
 use crate::error::{Dipole1DError, Result};
 use crate::layers::LayerCoefficients;
 use num_complex::Complex64;
-use std::f64::consts::PI;
 
 /// 1D layered earth model
 #[derive(Debug, Clone)]
@@ -173,6 +172,7 @@ fn complex_sqrt(z: Complex64) -> Complex64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::f64::consts::PI;
 
     #[test]
     fn test_find_layer() {

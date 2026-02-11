@@ -1201,7 +1201,7 @@ pub fn compute_hed_coefficients_with_derivs_buf(
 
 /// Complex square root with proper branch cut
 /// Returns the principal square root with positive real part
-pub fn complex_sqrt(z: Complex64) -> Complex64 {
+pub(crate) fn complex_sqrt(z: Complex64) -> Complex64 {
     let r = z.norm();
     let theta = z.arg();
     Complex64::from_polar(r.sqrt(), theta / 2.0)

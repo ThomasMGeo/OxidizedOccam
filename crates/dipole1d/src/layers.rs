@@ -208,13 +208,13 @@ pub fn compute_hed_potential_coefficients(
     tx_layer: usize,
     rx_layer: usize,
     z_tx: f64,
-    z_rx: f64,
+    _z_rx: f64,
 ) -> (Complex64, Complex64, Complex64, Complex64) {
     let tm = compute_tm_coefficients(model, lambda, omega, tx_layer);
     let te = compute_te_coefficients(model, lambda, omega, tx_layer);
 
     let u_tx = model.vertical_wavenumber(tx_layer, lambda, omega);
-    let u_rx = model.vertical_wavenumber(rx_layer, lambda, omega);
+    let _u_rx = model.vertical_wavenumber(rx_layer, lambda, omega);
 
     // Source amplitude (normalized)
     let source = Complex64::new(1.0, 0.0);
@@ -322,7 +322,7 @@ pub fn compute_ved_potential_coefficients(
     tx_layer: usize,
     rx_layer: usize,
     z_tx: f64,
-    z_rx: f64,
+    _z_rx: f64,
 ) -> (Complex64, Complex64) {
     let tm = compute_tm_coefficients(model, lambda, omega, tx_layer);
 

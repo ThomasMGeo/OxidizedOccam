@@ -208,8 +208,8 @@ where
         std::mem::swap(&mut fa, &mut fb);
     }
 
-    let mut c = a;
-    let mut fc = fa;
+    let _c = a;
+    let _fc = fa;
 
     for _ in 0..max_iter {
         if (b - a).abs() < tol {
@@ -222,10 +222,10 @@ where
 
         if fm < 0.0 {
             a = m;
-            fa = fm;
+            let _ = fm;
         } else {
             b = m;
-            fb = fm;
+            let _ = fm;
         }
     }
 

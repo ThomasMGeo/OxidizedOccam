@@ -339,13 +339,14 @@ impl EMData {
     }
 
     /// Read EMData from a reader
+    #[allow(unused_assignments)]
     pub fn read<R: BufRead>(reader: R) -> Result<Self> {
         let mut data = EMData::default();
         let mut lines = reader.lines().enumerate();
         let mut line_num = 0;
 
         // Helper to get next non-comment line
-        let mut next_line = |lines: &mut std::iter::Enumerate<std::io::Lines<R>>| -> Result<(usize, String)> {
+        let next_line = |lines: &mut std::iter::Enumerate<std::io::Lines<R>>| -> Result<(usize, String)> {
             loop {
                 match lines.next() {
                     Some((num, Ok(line))) => {

@@ -49,12 +49,71 @@ Benchmarked on Apple Silicon, median ms/iter:
 
 ```bash
 cargo build --release
+```
 
-# Run the canonical reservoir example
-occam1d invert --startup examples/canonical_reservoir/startup -v
+### Running a forward model
 
-# Forward model only
-occam1d forward --startup examples/canonical_reservoir/startup -v
+Compute the forward response for a starting model:
+
+```bash
+cd examples/canonical_reservoir
+occam1d forward --startup startup -v
+```
+
+This reads the `startup` file (which references a `model` file and a `.data`
+file), computes the EM fields for every transmitter/receiver/frequency
+combination, and writes:
+- `forward.resp` -- EMResp_1.2 format (Fortran/Matlab compatible)
+- `forward.csv` -- tidy CSV with columns `type`, `freq_hz`, `offset_m`,
+  `observed`, `computed`, `residual`, etc.
+
+Use `--output <name>` to change the output file prefix.
+
+### Running an inversion
+
+Run the Occam inversion to convergence:
+
+```bash
+cd examples/canonical_reservoir
+occam1d invert --startup startup -v
+```
+
+Each iteration writes three files:
+- `iter_NNNN.iter` -- iteration parameters (can be used as `--startup` to resume)
+- `iter_NNNN.resp` -- EMResp_1.2 response file
+- `iter_NNNN.csv` -- tidy CSV of observed vs computed data
+
+The inversion runs until the target RMS misfit (default 1.0) is reached or the
+maximum number of iterations is exceeded. To resume from iteration 10:
+
+```bash
+occam1d invert --startup iter_0010.iter -v
+```
+
+### Plotting results
+
+The example directories include Python plotting scripts. Install dependencies
+and the shared `oxoccam_plot` package first:
+
+```bash
+cd examples
+pip install -e .
+
+# Plot forward response
+python canonical_reservoir/plot_forward.py
+
+# Plot inversion convergence
+python canonical_reservoir/plot_inversion.py
+```
+
+### MT example
+
+```bash
+cd examples/canonical_mt
+occam1d forward --startup startup -v
+occam1d invert --startup startup -v
+python plot_forward.py
+python plot_inversion.py
 ```
 
 ## Crate Structure

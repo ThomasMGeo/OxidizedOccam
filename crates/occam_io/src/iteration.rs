@@ -155,13 +155,14 @@ impl IterationFile {
     }
 
     /// Read from reader
+    #[allow(unused_assignments)]
     pub fn read<R: BufRead>(reader: R) -> Result<Self> {
         let mut iter = IterationFile::default();
         let mut lines = reader.lines().enumerate();
         let mut line_num;
 
         // Helper to get next non-empty line
-        let mut next_line = |lines: &mut std::iter::Enumerate<std::io::Lines<R>>| -> Result<Option<(usize, String)>> {
+        let next_line = |lines: &mut std::iter::Enumerate<std::io::Lines<R>>| -> Result<Option<(usize, String)>> {
             loop {
                 match lines.next() {
                     Some((num, Ok(line))) => {

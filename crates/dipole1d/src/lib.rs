@@ -66,12 +66,6 @@ pub mod constants {
 
     /// Permeability of free space (H/m)
     pub const MU0: f64 = 4.0e-7 * PI;
-
-    /// Permittivity of free space (F/m)
-    pub const EPS0: f64 = 8.8541878176e-12;
-
-    /// Speed of light (m/s)
-    pub const C: f64 = 299792458.0;
 }
 
 /// Transmitter configuration
@@ -149,16 +143,6 @@ impl Transmitter {
     /// Check if this is a point dipole
     pub fn is_point_dipole(&self) -> bool {
         self.length == 0.0
-    }
-
-    /// Check if this is a horizontal dipole
-    pub fn is_horizontal(&self) -> bool {
-        self.dip.abs() < 1e-10
-    }
-
-    /// Check if this is a vertical dipole
-    pub fn is_vertical(&self) -> bool {
-        (self.dip.abs() - 90.0).abs() < 1e-10
     }
 
     /// Get unit direction vector (in transmitter-local coordinates)

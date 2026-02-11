@@ -60,14 +60,16 @@ def main():
             continue
         tokens = line.split()
         if len(tokens) >= 6:
-            data_points.append({
-                "type": int(tokens[0]),
-                "freq": int(tokens[1]),
-                "tx": int(tokens[2]),
-                "rx": int(tokens[3]),
-                "value": float(tokens[4]),
-                "error": float(tokens[5]),
-            })
+            data_points.append(
+                {
+                    "type": int(tokens[0]),
+                    "freq": int(tokens[1]),
+                    "tx": int(tokens[2]),
+                    "rx": int(tokens[3]),
+                    "value": float(tokens[4]),
+                    "error": float(tokens[5]),
+                }
+            )
 
     # Group by (freq, tx, rx) to find EyReal/EyImag pairs
     groups = defaultdict(dict)
@@ -82,17 +84,19 @@ def main():
         if 3 in types and 4 in types:
             ey_real = types[3]["value"]
             ey_imag = types[4]["value"]
-            pe_max = math.sqrt(ey_real ** 2 + ey_imag ** 2)
+            pe_max = math.sqrt(ey_real**2 + ey_imag**2)
             # Use same relative error (approx 2%), with noise floor
             err = max(0.02 * abs(pe_max), 1e-15)
-            pe_points.append({
-                "type": 41,
-                "freq": key[0],
-                "tx": key[1],
-                "rx": key[2],
-                "value": pe_max,
-                "error": err,
-            })
+            pe_points.append(
+                {
+                    "type": 41,
+                    "freq": key[0],
+                    "tx": key[1],
+                    "rx": key[2],
+                    "value": pe_max,
+                    "error": err,
+                }
+            )
 
     if not pe_points:
         sys.exit("No EyReal/EyImag pairs found in data file")
@@ -106,8 +110,10 @@ def main():
         for line in lines:
             f.write(line)
         for dp in pe_points:
-            f.write(f"{dp['type']:12d}{dp['freq']:12d}{dp['tx']:12d}"
-                    f"{dp['rx']:12d}{dp['value']:14.6e}{dp['error']:14.6e}\n")
+            f.write(
+                f"{dp['type']:12d}{dp['freq']:12d}{dp['tx']:12d}"
+                f"{dp['rx']:12d}{dp['value']:14.6e}{dp['error']:14.6e}\n"
+            )
 
     print(f"Added {len(pe_points)} PEmax data points")
     print(f"Total data points: {new_n_data}")

@@ -443,7 +443,7 @@ pub fn compute_ved_fields_with_sensitivity(
     model: &LayeredEarth,
     _coeffs: &LayerCoefficients,
     filter: &HankelFilter,
-    z_tx: f64,
+    _z_tx: f64,
     z_rx: f64,
     tx_layer: usize,
     rx_layer: usize,

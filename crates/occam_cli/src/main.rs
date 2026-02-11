@@ -8,7 +8,7 @@
 
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
-use occam_core::{OccamConfig, OccamInversion};
+use occam_core::OccamInversion;
 use occam_io::{EMData, IterationFile, LayeredModel, write_resp_file, write_csv_file};
 use std::path::PathBuf;
 

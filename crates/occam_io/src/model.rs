@@ -81,7 +81,7 @@ impl LayeredModel {
         water_depth: f64,
         water_resistivity: f64,
         layer_depths: &[f64],
-        initial_resistivity: f64,
+        _initial_resistivity: f64,
     ) -> Self {
         let mut model = Self::new();
 
@@ -109,13 +109,14 @@ impl LayeredModel {
     }
 
     /// Read model from reader
+    #[allow(unused_assignments)]
     pub fn read<R: BufRead>(reader: R) -> Result<Self> {
         let mut model = LayeredModel::new();
         let mut lines = reader.lines().enumerate();
         let mut line_num;
 
         // Helper to get next non-comment line
-        let mut next_line = |lines: &mut std::iter::Enumerate<std::io::Lines<R>>| -> Result<Option<(usize, String)>> {
+        let next_line = |lines: &mut std::iter::Enumerate<std::io::Lines<R>>| -> Result<Option<(usize, String)>> {
             loop {
                 match lines.next() {
                     Some((num, Ok(line))) => {

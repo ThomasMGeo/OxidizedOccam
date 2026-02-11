@@ -2,6 +2,9 @@
 name = "occam_cli"
 version.workspace = true
 edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
 description = "Command-line interface for Occam 1D inversion"
 
 [[bin]]
@@ -13,5 +16,3 @@ clap.workspace = true
 anyhow.workspace = true
 occam_core.workspace = true
 occam_io.workspace = true
-dipole1d.workspace = true
-mt1d.workspace = true

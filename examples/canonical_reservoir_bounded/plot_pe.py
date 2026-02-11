@@ -23,7 +23,7 @@ example_dir = os.path.dirname(os.path.abspath(__file__))
 # ── Load PE forward CSV (starting model with PEmax data) ────────────
 pe_csv = os.path.join(example_dir, "pe_forward.csv")
 if not os.path.exists(pe_csv):
-    sys.exit(f"Run 'occam1d forward --startup startup_pe --output pe_forward' first")
+    sys.exit("Run 'occam1d forward --startup startup_pe --output pe_forward' first")
 df_pe = pd.read_csv(pe_csv)
 
 # ── Reconstruct PEmax from final inversion iteration ────────────────
@@ -44,12 +44,14 @@ if iter_csvs:
         im = ey_imag.loc[key]
         pe_comp = math.sqrt(r["computed"] ** 2 + im["computed"] ** 2)
         pe_obs = math.sqrt(r["observed"] ** 2 + im["observed"] ** 2)
-        rows.append({
-            "freq_hz": key[0],
-            "offset_m": r["offset_m"],
-            "pe_computed": pe_comp,
-            "pe_observed": pe_obs,
-        })
+        rows.append(
+            {
+                "freq_hz": key[0],
+                "offset_m": r["offset_m"],
+                "pe_computed": pe_comp,
+                "pe_observed": pe_obs,
+            }
+        )
     df_final_pe = pd.DataFrame(rows)
 
 # ── Filter to PEmax rows ────────────────────────────────────────────
@@ -57,8 +59,9 @@ df_pmax = df_pe[df_pe["type"] == 41].copy()
 freqs = sorted(df_pmax["freq_hz"].unique())
 
 # ── Plot ─────────────────────────────────────────────────────────────
-fig, axes = plt.subplots(1, len(freqs), figsize=(5.5 * len(freqs), 4.2),
-                         squeeze=False, sharey=True)
+fig, axes = plt.subplots(
+    1, len(freqs), figsize=(5.5 * len(freqs), 4.2), squeeze=False, sharey=True
+)
 
 for j, freq in enumerate(freqs):
     ax = axes[0, j]
@@ -71,15 +74,19 @@ for j, freq in enumerate(freqs):
     comp = np.abs(sub["computed"].values)
 
     ax.semilogy(offset_km, obs, "ko", ms=4, label="Observed", zorder=3)
-    ax.semilogy(offset_km, comp, "-", color="0.65", lw=1.2,
-                label="Starting model", zorder=1)
+    ax.semilogy(offset_km, comp, "-", color="0.65", lw=1.2, label="Starting model", zorder=1)
 
     if df_final_pe is not None:
         sub_f = df_final_pe[df_final_pe["freq_hz"] == freq].sort_values("offset_m")
         if not sub_f.empty:
-            ax.semilogy(sub_f["offset_m"].values / 1000.0,
-                        np.abs(sub_f["pe_computed"].values),
-                        "r-", lw=1.6, label=f"Iter {final_iter}", zorder=2)
+            ax.semilogy(
+                sub_f["offset_m"].values / 1000.0,
+                np.abs(sub_f["pe_computed"].values),
+                "r-",
+                lw=1.6,
+                label=f"Iter {final_iter}",
+                zorder=2,
+            )
 
     ax.set_title(f"{freq} Hz", fontsize=11)
     ax.set_xlabel("Offset (km)", fontsize=10)
@@ -91,7 +98,7 @@ for j, freq in enumerate(freqs):
     ax.grid(True, alpha=0.3)
 
 rms_start = np.sqrt(np.mean(df_pmax["residual"].values ** 2))
-title = f"PE Major Axis — Bounded  (starting RMS = {rms_start:.2f}"
+title = f"PE Major Axis \u2014 Bounded  (starting RMS = {rms_start:.2f}"
 if final_iter is not None:
     title += f",  final iter = {final_iter}"
 title += ")"

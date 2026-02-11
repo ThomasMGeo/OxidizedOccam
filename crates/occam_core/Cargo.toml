@@ -2,13 +2,15 @@
 name = "occam_core"
 version.workspace = true
 edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
 description = "Core Occam inversion algorithm"
 
 [dependencies]
 nalgebra.workspace = true
 num-complex.workspace = true
 thiserror.workspace = true
-anyhow.workspace = true
 rayon.workspace = true
 dipole1d.workspace = true
 mt1d.workspace = true
