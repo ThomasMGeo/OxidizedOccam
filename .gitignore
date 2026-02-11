@@ -30,3 +30,4 @@ __pycache__/
 
 # Generated plots
 *.png
+!doc/*.png

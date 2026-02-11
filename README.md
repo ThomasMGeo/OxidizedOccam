@@ -11,6 +11,11 @@ Scripps Institution of Oceanography, UC San Diego.
 The original Fortran code is sponsored by the
 [Seafloor Electromagnetic Methods Consortium (SEMC)](https://marineemlab.ucsd.edu/semc.html).
 
+<p align="center">
+  <img src="doc/inversion_example.png" width="700"
+       alt="Canonical reservoir inversion — resistivity models and RMS convergence">
+</p>
+
 ## Features
 
 - **CSEM forward modeling** -- HED and VED sources in layered media, arbitrary
@@ -51,70 +56,21 @@ Benchmarked on Apple Silicon, median ms/iter:
 cargo build --release
 ```
 
-### Running a forward model
-
-Compute the forward response for a starting model:
-
 ```bash
 cd examples/canonical_reservoir
+
+# Forward model
 occam1d forward --startup startup -v
-```
 
-This reads the `startup` file (which references a `model` file and a `.data`
-file), computes the EM fields for every transmitter/receiver/frequency
-combination, and writes:
-- `forward.resp` -- EMResp_1.2 format (Fortran/Matlab compatible)
-- `forward.csv` -- tidy CSV with columns `type`, `freq_hz`, `offset_m`,
-  `observed`, `computed`, `residual`, etc.
-
-Use `--output <name>` to change the output file prefix.
-
-### Running an inversion
-
-Run the Occam inversion to convergence:
-
-```bash
-cd examples/canonical_reservoir
+# Inversion (writes iter_NNNN.iter, .resp, .csv each iteration)
 occam1d invert --startup startup -v
-```
 
-Each iteration writes three files:
-- `iter_NNNN.iter` -- iteration parameters (can be used as `--startup` to resume)
-- `iter_NNNN.resp` -- EMResp_1.2 response file
-- `iter_NNNN.csv` -- tidy CSV of observed vs computed data
-
-The inversion runs until the target RMS misfit (default 1.0) is reached or the
-maximum number of iterations is exceeded. To resume from iteration 10:
-
-```bash
-occam1d invert --startup iter_0010.iter -v
-```
-
-### Plotting results
-
-The example directories include Python plotting scripts. Install dependencies
-and the shared `oxoccam_plot` package first:
-
-```bash
-cd examples
-pip install -e .
-
-# Plot forward response
-python canonical_reservoir/plot_forward.py
-
-# Plot inversion convergence
-python canonical_reservoir/plot_inversion.py
-```
-
-### MT example
-
-```bash
-cd examples/canonical_mt
-occam1d forward --startup startup -v
-occam1d invert --startup startup -v
+# Plot results (install oxoccam_plot first: cd examples && pip install -e .)
 python plot_forward.py
 python plot_inversion.py
 ```
+
+To resume an inversion from a checkpoint: `occam1d invert --startup iter_0010.iter -v`
 
 ## Crate Structure
 
@@ -125,27 +81,6 @@ python plot_inversion.py
 | `occam_core` | Occam inversion (regularization, line search, bounds transforms) |
 | `occam_io` | File I/O for data, model, iteration, and response files |
 | `occam_cli` | Command-line interface (`occam1d`) |
-
-## CLI
-
-```bash
-# Inversion
-occam1d invert --startup startup -v
-
-# Forward modeling
-occam1d forward --startup startup -o response -v
-
-# Create a model file
-occam1d create-model --output model --water-depth 1000 --n-layers 75 --max-depth 4000
-
-# Validate files
-occam1d validate startup
-occam1d validate model -t model
-occam1d validate data.data -t data
-```
-
-Output files: `iter_NNNN.iter` (parameters), `iter_NNNN.resp` (EMResp_1.2
-format), `iter_NNNN.csv` (tidy CSV for plotting).
 
 ## Examples
 
