@@ -639,6 +639,13 @@ impl OccamInversion {
                     log_mu, result.rms_misfit, frac
                 );
             }
+            // A non-finite misfit means the trial model left the range the
+            // forward code can evaluate (e.g. 10^x overflowed for an
+            // under-regularised solve). Treat it like a failed solve so the
+            // bracketing sees an ordinary "very bad" value instead of NaN.
+            if !result.rms_misfit.is_finite() {
+                return Ok(1e10);
+            }
             Ok(result.rms_misfit)
         };
 
@@ -685,7 +692,12 @@ impl OccamInversion {
         let new_m = self.to_bounded(&new_x);
         let result = self.forward.compute_with_cache(&new_m, obs, &errors)?;
 
-        Ok((new_x, result.rms_misfit, final_log_mu, result.computed))
+        // Same rule for the chosen model: if every trial failed, report the
+        // step as very bad so the caller cuts the step size instead of
+        // accepting a NaN misfit (NaN compares false against everything).
+        let misfit = if result.rms_misfit.is_finite() { result.rms_misfit } else { 1e10 };
+
+        Ok((new_x, misfit, final_log_mu, result.computed))
     }
 
     /// Check convergence status
