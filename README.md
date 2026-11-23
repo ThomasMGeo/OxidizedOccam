@@ -72,6 +72,22 @@ python plot_inversion.py
 
 To resume an inversion from a checkpoint: `occam1d invert --startup iter_0010.iter -v`
 
+### Stopping a stalled inversion
+
+Some data cannot be fit to the target misfit by any 1D model. By default such a run
+continues to `Iterations to run`, lowering the RMS in the fourth decimal while the model
+gets rougher. To stop it early, add this line to the startup file:
+
+```
+Delta Misfit Limit: 0.0001
+```
+
+The inversion then stops (status `auto`) when one iteration changes the RMS misfit by less
+than this value while the misfit is still above target. The default, 0, turns the test off.
+As in the Fortran Occam1DCSEM, a single slow iteration is enough to trigger it, so keep the
+value small: on a set of field MT soundings 1e-4 stopped only the unfittable ones, while
+1e-3 also stopped one sounding a step before it would have converged.
+
 ## Crate Structure
 
 | Crate | Description |
