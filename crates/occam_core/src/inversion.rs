@@ -546,7 +546,19 @@ impl OccamInversion {
 
         for _ in 0..self.config.max_iterations {
             let t0 = Instant::now();
-            let result = self.iterate(&x_params)?;
+            let result = match self.iterate(&x_params) {
+                // The Lagrange search could not factorise the normal equations
+                // for its chosen mu, so this step produced no model. Stop here
+                // and keep the last successfully computed model as the result.
+                Err(OccamError::LinearAlgebra(_)) => {
+                    self.iteration -= 1;
+                    if let Some(last) = results.last_mut() {
+                        last.status = ConvergenceStatus::FactorizationFailed;
+                    }
+                    break;
+                }
+                result => result?,
+            };
             let elapsed = t0.elapsed();
 
             // Convert result parameters back to x-space for next iteration
@@ -797,6 +809,53 @@ fn misfit_stalled(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A failed Cholesky decomposition in the final solve of the Lagrange
+    /// search must stop the run gracefully instead of returning an error.
+    ///
+    /// The failure is forced with a NaN starting model: the Jacobian is then
+    /// NaN, so the normal-equations matrix cannot be factorised for any mu.
+    #[test]
+    fn test_factorization_failure_stops_gracefully() {
+        let data_text = "\
+Format:  EMData_1.1
+# Transmitters:   1
+  0  0  0  0  0
+# Frequencies:    2
+  1.0
+  0.1
+Phase Convention: lag
+# Receivers:      1
+  0  0  0  0  0  0
+# Data:       4
+  103  1  0  1  100.0  10.0
+  104  1  0  1  45.0  2.0
+  103  2  0  1  100.0  10.0
+  104  2  0  1  45.0  2.0
+";
+        let model_text = "\
+Format: Resistivity1DMod_1.0
+#LAYERS:    4
+  -100000  1d12  0  0  0
+  0.0      ?     1  0  0
+  500.0    ?     1  0  0
+  2000.0   ?     1  0  0
+";
+        let data = EMData::read(data_text.as_bytes()).unwrap();
+        let model = LayeredModel::read(model_text.as_bytes()).unwrap();
+        let n_params = model.n_free_params();
+
+        let mut inversion = OccamInversion::new(data, model, OccamConfig::default()).unwrap();
+        let results = inversion.run(&vec![f64::NAN; n_params]).unwrap();
+
+        // Only the starting model is returned, flagged with the new status
+        assert_eq!(results.len(), 1);
+        let last = results.last().unwrap();
+        assert_eq!(last.iteration, 0);
+        assert_eq!(last.status, ConvergenceStatus::FactorizationFailed);
+        assert!(last.status.should_stop());
+        assert!(!last.status.is_success());
+    }
 
     #[test]
     fn delta_misfit_zero_limit_never_triggers() {

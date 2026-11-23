@@ -49,6 +49,9 @@ pub enum ConvergenceStatus {
     /// (Fortran Occam.f90 `konv = 4`). The inversion stops so the user can
     /// inspect residuals / error floors; the target misfit was NOT reached.
     AutoConverged,
+    /// Cholesky decomposition of the normal equations failed, so the step
+    /// produced no model; the last successfully computed model is kept
+    FactorizationFailed,
 }
 
 impl ConvergenceStatus {
@@ -60,6 +63,7 @@ impl ConvergenceStatus {
                 | ConvergenceStatus::PerfectlySmooth
                 | ConvergenceStatus::Diverging
                 | ConvergenceStatus::AutoConverged
+                | ConvergenceStatus::FactorizationFailed
         )
     }
 
