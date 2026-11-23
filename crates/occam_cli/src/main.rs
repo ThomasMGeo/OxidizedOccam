@@ -217,6 +217,12 @@ fn run_inversion(startup_path: &PathBuf, output_prefix: &str, verbose: bool) -> 
             println!("Inversion completed successfully.");
         } else {
             println!("Inversion stopped: {:?}", final_result.status);
+            if final_result.status == occam_core::ConvergenceStatus::FactorizationFailed {
+                println!(
+                    "Cholesky decomposition failed in the next step; keeping the model from iteration {}.",
+                    final_result.iteration
+                );
+            }
         }
     }
     println!("Total wall time: {:.2}s ({} iterations)", total_elapsed.as_secs_f64(), results.len() - 1);
@@ -233,6 +239,7 @@ fn format_status(status: occam_core::ConvergenceStatus) -> &'static str {
         occam_core::ConvergenceStatus::Diverging => "diverge",
         occam_core::ConvergenceStatus::RoughnessIncreasing => "rough+",
         occam_core::ConvergenceStatus::AutoConverged => "auto",
+        occam_core::ConvergenceStatus::FactorizationFailed => "cholfail",
     }
 }
 

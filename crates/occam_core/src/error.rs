@@ -46,6 +46,9 @@ pub enum ConvergenceStatus {
     RoughnessIncreasing,
     /// Auto-convergence triggered
     AutoConverged,
+    /// Cholesky decomposition of the normal equations failed, so the step
+    /// produced no model; the last successfully computed model is kept
+    FactorizationFailed,
 }
 
 impl ConvergenceStatus {
@@ -57,6 +60,7 @@ impl ConvergenceStatus {
                 | ConvergenceStatus::PerfectlySmooth
                 | ConvergenceStatus::Diverging
                 | ConvergenceStatus::AutoConverged
+                | ConvergenceStatus::FactorizationFailed
         )
     }
 
