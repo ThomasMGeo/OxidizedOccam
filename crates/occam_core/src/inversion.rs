@@ -32,6 +32,10 @@ pub struct OccamConfig {
     pub bounds: ParameterBounds,
     /// Debug level
     pub debug_level: i32,
+    /// Auto-converge threshold on the absolute change in RMS misfit over one
+    /// iteration (iteration file: `Delta Misfit Limit`).
+    /// 0.0 (the default) disables the check. See `misfit_stalled`.
+    pub delta_misfit_limit: f64,
 }
 
 impl Default for OccamConfig {
@@ -47,6 +51,7 @@ impl Default for OccamConfig {
             lagrange_tolerance: 0.1,
             bounds: ParameterBounds::default(),
             debug_level: 0,
+            delta_misfit_limit: 0.0,
         }
     }
 }
@@ -187,6 +192,7 @@ impl OccamInversion {
             roughness_type: iteration_file.roughness_type,
             initial_lagrange: iteration_file.lagrange_value,
             debug_level: iteration_file.debug_level,
+            delta_misfit_limit: iteration_file.delta_misfit_limit,
             ..Default::default()
         };
 
@@ -651,6 +657,13 @@ impl OccamInversion {
                     log_mu, result.rms_misfit, frac
                 );
             }
+            // A non-finite misfit means the trial model left the range the
+            // forward code can evaluate (e.g. 10^x overflowed for an
+            // under-regularised solve). Treat it like a failed solve so the
+            // bracketing sees an ordinary "very bad" value instead of NaN.
+            if !result.rms_misfit.is_finite() {
+                return Ok(1e10);
+            }
             Ok(result.rms_misfit)
         };
 
@@ -697,7 +710,12 @@ impl OccamInversion {
         let new_m = self.to_bounded(&new_x);
         let result = self.forward.compute_with_cache(&new_m, obs, &errors)?;
 
-        Ok((new_x, result.rms_misfit, final_log_mu, result.computed))
+        // Same rule for the chosen model: if every trial failed, report the
+        // step as very bad so the caller cuts the step size instead of
+        // accepting a NaN misfit (NaN compares false against everything).
+        let misfit = if result.rms_misfit.is_finite() { result.rms_misfit } else { 1e10 };
+
+        Ok((new_x, misfit, final_log_mu, result.computed))
     }
 
     /// Check convergence status
@@ -743,8 +761,49 @@ impl OccamInversion {
             return ConvergenceStatus::Diverging;
         }
 
+        // Auto-converge: misfit stalled above target (Delta Misfit Limit)
+        if misfit_stalled(
+            prev_misfit,
+            new_misfit,
+            self.config.target_misfit,
+            self.config.delta_misfit_limit,
+        ) {
+            return ConvergenceStatus::AutoConverged;
+        }
+
         ConvergenceStatus::Iterating
     }
+}
+
+/// `Delta Misfit Limit` stall test ("auto converge").
+///
+/// Returns true when an iteration ended with the RMS misfit still above the
+/// target and the absolute change in RMS misfit over that iteration is
+/// strictly smaller than `delta_misfit_limit`:
+///
+///   new_misfit > target_misfit  &&  |new_misfit - prev_misfit| < limit
+///
+/// `prev_misfit` is the misfit of the model the iteration started from and
+/// `new_misfit` the misfit of the model it produced (Fortran `tol0`/`tobt`).
+/// The change is absolute (RMS units), not relative. A limit of 0.0 (the
+/// default when the field is absent) can never trigger, nor can a negative
+/// or NaN limit.
+///
+/// Fortran ref: Occam1DCSEM v3.13, Occam.f90, end of compOccamIteration:
+///   if (tmin < tolreq) then ... else
+///       tobt = tmin
+///       if (abs(tobt - tol0) < rDeltaMisfit) konv = 4
+/// The test only runs in the branch where the new misfit is not below the
+/// target, so it never cuts short the smoothing phase of a model that fits.
+/// (At exact equality `new_misfit == target_misfit` this code reports
+/// `TargetReached` before the stall test is consulted.)
+fn misfit_stalled(
+    prev_misfit: f64,
+    new_misfit: f64,
+    target_misfit: f64,
+    delta_misfit_limit: f64,
+) -> bool {
+    new_misfit > target_misfit && (new_misfit - prev_misfit).abs() < delta_misfit_limit
 }
 
 #[cfg(test)]
@@ -796,5 +855,45 @@ Format: Resistivity1DMod_1.0
         assert_eq!(last.status, ConvergenceStatus::FactorizationFailed);
         assert!(last.status.should_stop());
         assert!(!last.status.is_success());
+    }
+
+    #[test]
+    fn delta_misfit_zero_limit_never_triggers() {
+        // Default (field absent or 0.0): no stall detection, even for an
+        // iteration that did not change the misfit at all.
+        assert!(!misfit_stalled(1.3590, 1.3590, 1.0, 0.0));
+        assert!(!misfit_stalled(1.3591, 1.3590, 1.0, 0.0));
+        assert!(!misfit_stalled(1.3591, 1.3590, 1.0, -1.0));
+        assert!(!misfit_stalled(1.3591, 1.3590, 1.0, f64::NAN));
+    }
+
+    #[test]
+    fn delta_misfit_stall_above_target_triggers() {
+        // |1.3590 - 1.3591| = 1e-4 < 1e-3, still above target 1.0
+        assert!(misfit_stalled(1.3591, 1.3590, 1.0, 1e-3));
+        // Absolute change, either sign
+        assert!(misfit_stalled(1.3590, 1.3591, 1.0, 1e-3));
+    }
+
+    #[test]
+    fn delta_misfit_large_change_keeps_iterating() {
+        assert!(!misfit_stalled(5.0, 2.0, 1.0, 1e-3));
+        // Strict inequality: a change equal to the limit does not trigger
+        assert!(!misfit_stalled(1.5, 1.25, 1.0, 0.25));
+    }
+
+    #[test]
+    fn delta_misfit_ignored_once_target_reached() {
+        // Misfit at or below target: normal Occam smoothing/convergence logic
+        // applies, however small the change.
+        assert!(!misfit_stalled(1.0001, 0.9999, 1.0, 1e-3));
+        assert!(!misfit_stalled(1.0, 1.0, 1.0, 1e-3));
+        assert!(!misfit_stalled(0.9, 0.9, 1.0, 1e-3));
+    }
+
+    #[test]
+    fn auto_converged_stops_but_is_not_success() {
+        assert!(ConvergenceStatus::AutoConverged.should_stop());
+        assert!(!ConvergenceStatus::AutoConverged.is_success());
     }
 }

@@ -44,7 +44,10 @@ pub enum ConvergenceStatus {
     Diverging,
     /// Roughness increasing when should be decreasing
     RoughnessIncreasing,
-    /// Auto-convergence triggered
+    /// Auto-convergence triggered: the misfit changed by less than the
+    /// `Delta Misfit Limit` in one iteration without getting below the target
+    /// (Fortran Occam.f90 `konv = 4`). The inversion stops so the user can
+    /// inspect residuals / error floors; the target misfit was NOT reached.
     AutoConverged,
     /// Cholesky decomposition of the normal equations failed, so the step
     /// produced no model; the last successfully computed model is kept
@@ -70,7 +73,6 @@ impl ConvergenceStatus {
             self,
             ConvergenceStatus::Converged
                 | ConvergenceStatus::PerfectlySmooth
-                | ConvergenceStatus::AutoConverged
         )
     }
 }
