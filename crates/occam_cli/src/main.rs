@@ -138,6 +138,9 @@ fn run_inversion(startup_path: &PathBuf, output_prefix: &str, verbose: bool) -> 
         println!("Data file: {}", iteration_file.data_file);
         println!("Target misfit: {:.4}", iteration_file.target_misfit);
         println!("Max iterations: {}", iteration_file.max_iterations);
+        if iteration_file.delta_misfit_limit > 0.0 {
+            println!("Delta misfit limit: {}", iteration_file.delta_misfit_limit);
+        }
         if let Some((lo, hi)) = iteration_file.model_bounds {
             let transform = iteration_file.bounds_transform.as_deref().unwrap_or("bandpass");
             println!("Model bounds: [{}, {}] ({})", lo, hi, transform);
@@ -215,6 +218,11 @@ fn run_inversion(startup_path: &PathBuf, output_prefix: &str, verbose: bool) -> 
     if let Some(final_result) = results.last() {
         if final_result.status.is_success() {
             println!("Inversion completed successfully.");
+        } else if final_result.status == occam_core::ConvergenceStatus::AutoConverged {
+            println!("Inversion stopped: misfit changed by less than Delta Misfit Limit ({}).",
+                iteration_file.delta_misfit_limit);
+            println!("Target misfit {:.4} not reached (RMS {:.4}). Check the data errors / residuals.",
+                iteration_file.target_misfit, final_result.rms_misfit);
         } else {
             println!("Inversion stopped: {:?}", final_result.status);
         }
